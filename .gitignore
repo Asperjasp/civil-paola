@@ -1,0 +1,11 @@
+# Los materiales de referencia contienen nombres y no forman parte del repositorio.
+*.pptx
+*.pdf
+construplan.html
+Costeo y recuperación de inversión_ edificio de apartamentos.html
+__pycache__/
+*.pyc
+.vercel/
+.netlify/
+.env*
+!*.example

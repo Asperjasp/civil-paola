@@ -1,0 +1,4 @@
+# Enviar solo la aplicación pública y su configuración.
+/*
+!public
+!vercel.json
