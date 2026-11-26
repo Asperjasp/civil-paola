@@ -1,0 +1,21 @@
+{
+  "fecha": "2026-11-26",
+  "ambito": "Bogotá D. C., valores de orden de magnitud para prepresupuesto; no son cotizaciones verificadas",
+  "moneda": "COP",
+  "items": {
+    "excPrecio": {"min": 35000, "max": 90000, "unidad": "m³", "motivo": "excavación manual o mecánica ligera; depende de acceso, tipo de suelo, volumen, profundidad y agua"},
+    "retiroPrecio": {"min": 25000, "max": 80000, "unidad": "m³", "motivo": "cargue, viaje, distancia y disposición autorizada; pedir tarifa con destino"},
+    "cementoPrecio": {"min": 32000, "max": 45000, "unidad": "bulto de 50 kg", "motivo": "marca, tipo, proveedor, volumen y entrega"},
+    "viajePrecio": {"min": 180000, "max": 650000, "unidad": "viaje", "motivo": "tipo y tamaño de vehículo, horario, carga y distancia"},
+    "estructuraPrecio": {"min": 1200000, "max": 2600000, "unidad": "m² construido", "motivo": "estructura restante y mano de obra; diseño, acero y cimentación pueden cambiarlo"},
+    "redesPrecio": {"min": 4500000, "max": 11000000, "unidad": "apartamento", "motivo": "área, puntos, calidad de aparatos y trazado de redes"},
+    "acabadosPrecio": {"min": 900000, "max": 2400000, "unidad": "m² construido", "motivo": "calidad, carpintería, baños, cocina y alcance contratado"},
+    "panelPrecio": {"min": 1200000, "max": 2200000, "unidad": "kW de panel", "motivo": "módulo, potencia, volumen y logística"},
+    "solarRestoPrecio": {"min": 2800000, "max": 6500000, "unidad": "kW instalado", "motivo": "inversor, estructura, protecciones, cableado, trámite e instalación; excluye respaldo"}
+  },
+  "metodo": "Hipótesis editables para explorar el presupuesto. Los enlaces ofrecen contexto estadístico o precios para otros alcances. Para decidir, solicita ofertas comparables con proveedor, fecha, IVA, transporte, unidad y exclusiones.",
+  "fuentes_contexto": [
+    "https://www.dane.gov.co/index.php/estadisticas-por-tema/precios-y-costos/indice-de-costos-de-la-construccion-de-edificaciones-icoced",
+    "https://calidad.idu.gov.co/page/siipviales/economico/portafolio"
+  ]
+}

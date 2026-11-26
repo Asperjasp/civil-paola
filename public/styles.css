@@ -114,6 +114,17 @@ input:focus, select:focus, button:focus-visible, summary:focus-visible { outline
 .cost-group { border-top: 1px solid var(--line); margin-top: 24px; padding-top: 19px; }
 .cost-group .group-note { margin: -7px 0 15px; }
 .source-intro { color: var(--muted); font-size: .85rem; margin: 14px 0 -5px; }
+.suggestion { color:#657a70; font-size:.75rem; font-weight:450; }
+.reference-panel { background:#f0f8f3; border-radius:12px; padding:14px 16px; margin-bottom:15px; }
+.reference-panel p { margin:7px 0 0; color:var(--muted); font-size:.85rem; }
+.reference-panel button:disabled { opacity:.55; cursor:default; }
+.field-action { margin-top:6px; padding:5px 8px; font-size:.75rem; }
+.solar-toggle-label { padding:11px 13px; border:1px solid #d8e7df; background:#f5faf6; border-radius:12px; }
+.solar-toggle { display:block; position:relative; width:56px; height:30px; margin:8px 0; padding:0; border:0; border-radius:99px; background:#9aaba4; }
+.solar-toggle span { position:absolute; width:22px; height:22px; top:4px; left:4px; background:white; border-radius:50%; transition:transform .2s; }
+.solar-toggle[aria-checked="true"] { background:#08776b; }
+.solar-toggle[aria-checked="true"] span { transform:translateX(26px); }
+.solar-option { border:1px solid #c6e5d4; border-radius:15px; padding:18px; background:linear-gradient(135deg,#f1faf4,#fffbf2); }
 .assumptions, .source-register { border-top: 1px solid var(--line); margin-top: 24px; padding-top: 17px; }
 .assumptions .inside { padding-top: 17px; }
 .source-register .group-note { margin: 8px 0 12px; }

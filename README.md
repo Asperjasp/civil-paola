@@ -40,11 +40,11 @@ node tests/ui.test.js
 
 Los archivos de presentación y PDF del directorio raíz quedan fuera del contenido publicado.
 `.vercelignore` impide además que se suban a Vercel durante el despliegue por CLI.
-`.gitignore` excluye estos archivos de referencia y los HTML antiguos del repositorio de GitHub. El repositorio se prepara como privado.
+`.gitignore` excluye estos archivos de referencia y los HTML antiguos del repositorio de GitHub.
 
 ## Actualización de contexto
 
-El workflow [.github/workflows/indicador-semanal.yml](.github/workflows/indicador-semanal.yml) consulta cada lunes la página histórica oficial del ICOCED. Si detecta un boletín posterior, actualiza el enlace y el periodo en `public/data/indicadores.json` y deja la variación numérica **pendiente de revisión**, en vez de extraer a ciegas un valor del PDF. No modifica cotizaciones ni presupuestos. El DANE publica ICOCED mensualmente; consultar cada semana no crea un dato semanal. En un repositorio privado, la ejecución de Actions depende de la configuración y límites de la cuenta de GitHub.
+El workflow [.github/workflows/indicador-semanal.yml](.github/workflows/indicador-semanal.yml) consulta cada lunes la página histórica oficial del ICOCED. Si detecta un boletín posterior, actualiza el enlace y el periodo en `public/data/indicadores.json` y deja la variación numérica **pendiente de revisión**. El DANE publica el ICOCED mensualmente.
 
 ## Visuales
 
@@ -65,3 +65,7 @@ La flecha ascendente o descendente se añade con CSS según el VPN al plazo obje
 - Los rubros de estructura restante, acabados y otros costos permiten incorporar cotizaciones detalladas sin fingir que el cemento representa toda la obra. Cambia el precio de acabados al elegir Económico, Estándar o Premium.
 
 La app no obtiene precios en vivo. El ICOCED del DANE publica variaciones de costos, no una cotización de este edificio. Los precios de referencia del IDU corresponden a infraestructura vial y requieren ajuste antes de usarse en una edificación privada.
+
+**Aplicar costos orientativos** rellena campos vacíos con las hipótesis editables de [referencias-costos.json](public/data/referencias-costos.json) y las marca en la auditoría. El costo por piso divide las partidas de obra ingresadas entre el número de pisos, sin terreno ni solar. El transporte de la cuadrilla se suma por persona y jornada cuando indicas días de viaje. La opción de $7.100 diarios representa dos pasajes de $3.550 según la [tarifa de TransMilenio para 2026](https://www.transmilenio.gov.co/viaje-en-transmi/medios-de-pago/tarifas-del-sistema-transmilenio).
+
+En Kennedy, Suba y Chapinero puedes simular con el canon publicado en un anuncio y ver cuánto falta para alcanzar el canon necesario en tu plazo objetivo. Para fijar un precio contrasta más ofertas del mismo barrio, área y características. El interruptor solar activa la comparación de inversión adicional y ahorro del propietario.

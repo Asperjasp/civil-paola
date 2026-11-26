@@ -3,7 +3,7 @@
   const $ = id => document.getElementById(id);
   const money = value => new Intl.NumberFormat('es-CO', { style:'currency', currency:'COP', maximumFractionDigits:0 }).format(value);
   const count = value => new Intl.NumberFormat('es-CO', { maximumFractionDigits:2 }).format(value);
-  const fields = ['pisos','frente','fondo','cobertura','aptos','altura','dosificacion','capacidadViaje','viajesExtra','plazoMeses','esperaAnios','objetivoAnios','kwApto',
+  const fields = ['pisos','frente','fondo','cobertura','aptos','altura','dosificacion','capacidadViaje','viajesExtra','jornadasTransporte','personasCuadrilla','transporteDiarioPrecio','plazoMeses','esperaAnios','objetivoAnios','kwApto',
     'excPrecio','retiroPrecio','terrenoPrecio','intervencionPrecio','cementoPrecio','viajePrecio','estructuraPrecio','ingenieroPrecio',
     'redesPrecio','aguaPrecio','luzPrecio','gasPrecio','senalPrecio','acabadosPrecio','otrosPrecio',
     'panelPrecio','solarRestoPrecio','respaldoPrecio','arriendo','ocupacion','mantenimiento','predial','salvamento',
@@ -11,6 +11,7 @@
   const evidenceLabels = {
     excPrecio:'Excavación por m³',retiroPrecio:'Retiro y disposición por m³',terrenoPrecio:'Terreno o costo de oportunidad',
     intervencionPrecio:'Intervención de edificación existente',cementoPrecio:'Cemento por bulto',viajePrecio:'Transporte por viaje',
+    transporteDiarioPrecio:'Transporte de cuadrilla por persona y jornada',
     estructuraPrecio:'Estructura restante por m²',ingenieroPrecio:'Ingeniero estructural',redesPrecio:'Tuberías y cableado por apartamento',
     aguaPrecio:'Conexión de agua',luzPrecio:'Conexión eléctrica',gasPrecio:'Conexión de gas',senalPrecio:'Conexión de señal',
     acabadosPrecio:'Acabados por m²',otrosPrecio:'Otros costos de obra',panelPrecio:'Paneles por kW',
@@ -19,6 +20,19 @@
     ahorroSolar:'Ahorro solar anual del propietario',mantSolar:'Mantenimiento solar anual',salvamentoSolar:'Salvamento solar'
   };
   let demoLoaded = false;
+  const suggestedPrices = new Set();
+
+  function getLocalCase() {
+    return document.querySelector(`.case-card[data-locality="${$('localidad').value}"]`);
+  }
+
+  function renderRentReference() {
+    const listing = getLocalCase();
+    $('apply-rent').hidden = !listing;
+    $('rent-reference').textContent = listing
+      ? `${money(Number(listing.dataset.rent))}/mes en un anuncio de la localidad. Compara área, administración y acceso a transporte.`
+      : 'Busca anuncios del mismo barrio con área, habitaciones y administración comparables.';
+  }
 
   function readData() {
     const data = {};
@@ -30,13 +44,42 @@
   function showConditional() {
     const solar = $('compararSolar').value === 'si';
     document.querySelectorAll('[data-solar]').forEach(el => { el.hidden = !solar; });
+    $('solar-toggle').setAttribute('aria-checked',String(solar));
     document.querySelectorAll('[data-existing]').forEach(el => { el.hidden = $('existente').value !== 'si'; });
     $('results').hidden = true;
   }
   $('compararSolar').addEventListener('change', showConditional);
+  $('solar-toggle').addEventListener('click', () => {
+    $('compararSolar').value = $('compararSolar').value === 'si' ? 'no' : 'si';
+    showConditional();
+  });
   $('existente').addEventListener('change', showConditional);
-  $('form').addEventListener('input', () => { $('results').hidden = true; $('message').textContent = ''; });
+  $('localidad').addEventListener('change', renderRentReference);
+  $('form').addEventListener('input', event => {
+    $('results').hidden = true;
+    $('message').textContent = '';
+    const price = event.target;
+    if (!suggestedPrices.delete(price.id)) return;
+    $(`source-${price.id}`).value = '';
+    $(`date-${price.id}`).value = '';
+  });
   $('form').addEventListener('change', () => { $('results').hidden = true; $('message').textContent = ''; });
+  $('apply-rent').addEventListener('click', () => {
+    const listing = getLocalCase();
+    if (!listing) return;
+    $('arriendo').value = listing.dataset.rent;
+    suggestedPrices.add('arriendo');
+    $('source-arriendo').value = listing.querySelector('a').href;
+    $('date-arriendo').value = '2026-11-26';
+    $('results').hidden = true;
+  });
+  $('apply-transit').addEventListener('click', () => {
+    $('transporteDiarioPrecio').value = '7100';
+    suggestedPrices.add('transporteDiarioPrecio');
+    $('source-transporteDiarioPrecio').value = 'TransMilenio 2026 · dos pasajes de $3.550';
+    $('date-transporteDiarioPrecio').value = '2026-11-26';
+    $('results').hidden = true;
+  });
 
   function node(tag, text, className) {
     const element = document.createElement(tag);
@@ -66,6 +109,8 @@
     document.querySelectorAll('[data-money]').forEach(price => {
       const label = evidenceLabels[price.id] || price.id;
       const row = document.createElement('tr'); cell(row,'td',label);
+      if (price.closest?.('[data-solar]')) row.setAttribute('data-solar','');
+      if (price.closest?.('[data-existing]')) row.setAttribute('data-existing','');
       const sourceCell = document.createElement('td'), source = document.createElement('input');
       source.id = `source-${price.id}`; source.type = 'text'; source.placeholder = 'Proveedor, factura o enlace';
       source.setAttribute('aria-label',`Fuente de ${label}`); sourceCell.append(source);
@@ -84,16 +129,17 @@
       const source = $(`source-${id}`).value.trim();
       const date = $(`date-${id}`).value;
       return {id,label:evidenceLabels[id] || id,value:$(id).value,source,date,
-        status:demoLoaded ? 'Ejemplo ficticio' : source && date ? 'Fuente y fecha declaradas' : source || date ? 'Registro incompleto' : 'Sin fuente registrada'};
+        status:demoLoaded ? 'Ejemplo ficticio' : source.startsWith('Hipótesis CONSTRUPLAN') ? 'Hipótesis de planeación' : source && date ? 'Fuente y fecha declaradas' : source || date ? 'Registro incompleto' : 'Sin fuente registrada'};
     });
   }
   function renderEvidence(result,data) {
     const items = sourceItems(result,data);
-    const covered = items.filter(item => item.source && item.date).length;
+    const covered = items.filter(item => item.status === 'Fuente y fecha declaradas').length;
+    const estimated = items.filter(item => item.status === 'Hipótesis de planeación').length;
     $('sources-summary').textContent = `Fuentes por rubro · ${covered} de ${items.length} registros completos`;
     $('source-quality').textContent = demoLoaded
       ? 'Los valores del ejemplo son ficticios. Sustitúyelos por cotizaciones de Bogotá antes de usar la comparación para decidir.'
-      : `${covered} de ${items.length} importes utilizados tienen fuente y fecha declaradas. La app no comprueba la vigencia ni el contenido de esas fuentes.`;
+      : `${covered} de ${items.length} importes tienen fuente externa y fecha declaradas. ${estimated ? `${estimated} usan hipótesis de planeación. ` : ''}Confirma las cifras y su vigencia antes de contratar.`;
     $('source-quality').className = `source-quality ${covered === items.length && !demoLoaded ? 'complete' : ''}`;
     $('provenance-table').replaceChildren(table(['Dato','Valor ingresado','Fuente declarada','Fecha','Estado'],items.map(item => [
       item.label, money(Number(item.value)), item.source || '—', item.date || '—', item.status
@@ -229,11 +275,14 @@
     const recs = $('recommendation-list'); recs.replaceChildren();
     const add = (title,body) => { const item = node('article','', 'recommendation'); item.append(node('h3',title),node('p',body)); recs.append(item); };
     add('Canon y ocupación', requiredMonthlyRent === null ? 'Revisa el calendario de obra y la ocupación esperada.' : `Tu canon es ${money(data.arriendo)} frente a ${money(requiredMonthlyRent)} necesarios por apartamento. Prueba una ocupación menor para medir vacancia.`);
-    const localCase = document.querySelector(`.case-card[data-locality="${$('localidad').value}"]`);
+    const localCase = getLocalCase();
     if (localCase) {
       const comparable = Number(localCase.dataset.rent);
       const ratio = data.arriendo / comparable;
-      add('Contrasta la demanda local', `Tu canon es ${ratio > 1.2 ? 'más de 20 % superior' : ratio < .8 ? 'más de 20 % inferior' : 'cercano'} a un solo anuncio de ${$('localidad').value} (${money(comparable)}). No estima probabilidad de arriendo: verifica área, número de habitaciones, administración, ascensor, parqueadero y acceso a transporte con más comparables.`);
+      const gap = requiredMonthlyRent === null ? '' : requiredMonthlyRent > comparable
+        ? ` Para alcanzar tu meta necesitarías cobrar ${money(requiredMonthlyRent - comparable)} más al mes que ese anuncio. Si otros comparables confirman ese precio, prueba reducir costos, ampliar el plazo o cambiar la distribución antes de asumir un canon más alto.`
+        : ' El canon necesario para tu meta queda dentro de ese precio anunciado. Comprueba los comparables y la vacancia antes de fijarlo.';
+      add('Contrasta la demanda local', `Tu canon es ${ratio > 1.2 ? 'más de 20 % superior' : ratio < .8 ? 'más de 20 % inferior' : 'cercano'} al de un anuncio de ${$('localidad').value} (${money(comparable)}).${gap} Contrasta área, administración, amenidades, tiempo de viaje hacia zonas de empleo y días que llevan publicados otros anuncios.`);
     } else add('Contrasta la demanda local','No hay un anuncio de ejemplo para esta localidad. Busca al menos tres inmuebles comparables en el sector antes de fijar el canon.');
     if (data.pisos >= 5) add('Accesibilidad y norma','Con este número de pisos, confirma exigencias de ascensor, accesibilidad, estructura y altura permitida para el predio; incluye el costo en las cotizaciones.');
     if (data.compararSolar) add('Quién recibe el ahorro solar','Si los arrendatarios pagan su consumo y el canon no cambia, el ahorro del propietario puede ser cero. Contrasta la factura y la propuesta solar.');
@@ -252,7 +301,10 @@
     $('metrics').replaceChildren(metric('Excavación a 1,4 m',`${count(result.excavacion)} m³`),
       metric('Columnas ilustrativas',count(result.columnas),`${count(result.concretoColumnas)} m³ de concreto`),
       metric('Cemento estimado',`${count(result.bultos)} bultos`,`${count(result.viajes)} viajes de material`),
-      metric('Área construida supuesta',`${count(result.areaConstruida)} m²`,`${count(result.apartamentos)} apartamentos`));
+      metric('Área construida supuesta',`${count(result.areaConstruida)} m²`,`${count(result.apartamentos)} apartamentos`),
+      metric('Costo de obra por piso', result.rows.some(row => row.priceKey !== 'terrenoPrecio' && row.cost !== null)
+        ? money(result.rows.filter(row => row.priceKey !== 'terrenoPrecio').reduce((total, row) => total + (row.cost ?? 0), 0) / data.pisos)
+        : 'Carga precios', 'Promedio de los costos ingresados, sin terreno ni solar'));
     renderCosts(result,data);
     renderEvidence(result,data);
     if (result.ready) {
@@ -277,6 +329,41 @@
     $('results').scrollIntoView({behavior:'smooth',block:'start'});
   }
 
+  function renderPriceSuggestions() {
+    const suggestions = document.querySelectorAll('[data-suggest]');
+    if (!suggestions.length) return;
+    fetch('data/referencias-costos.json').then(response => {
+      if (!response.ok) throw new Error('No se cargaron las referencias');
+      return response.json();
+    }).then(reference => {
+      suggestions.forEach(label => {
+        const id = label.dataset.suggest, item = reference.items[id];
+        if (!item) return;
+        label.textContent = `${money(item.min)}–${money(item.max)} por ${item.unidad}. ${item.motivo}.`;
+      });
+      const button = $('apply-references');
+      button.disabled = false;
+      button.addEventListener('click', () => {
+        let filled = 0;
+        for (const [id, item] of Object.entries(reference.items)) {
+          const input = $(id);
+          if (input.value !== '' || input.closest('[hidden]')) continue;
+          const level = id === 'acabadosPrecio' ? $('nivel').value : 'Estándar';
+          input.value = Math.round(level === 'Económico' ? item.min : level === 'Premium' ? item.max : (item.min + item.max) / 2);
+          suggestedPrices.add(id);
+          $(`source-${id}`).value = `Hipótesis CONSTRUPLAN · ${reference.fecha}`;
+          $(`date-${id}`).value = reference.fecha;
+          filled++;
+        }
+        $('results').hidden = true;
+        $('reference-status').textContent = filled ? `Se aplicaron ${filled} valores orientativos en campos vacíos.` : 'Los campos con referencias ya están completos.';
+      });
+    }).catch(() => {
+      suggestions.forEach(label => { label.textContent = ''; });
+      $('reference-status').textContent = 'No se pudo cargar la tabla de referencias. Abre la app desde el sitio o un servidor local.';
+    });
+  }
+
   $('form').addEventListener('submit',event => {
     event.preventDefault();
     if (!$('localidad').value || !$('estrato').value) { $('message').textContent = 'Selecciona la localidad y el estrato.'; return; }
@@ -289,19 +376,21 @@
 
   $('demo').addEventListener('click', () => {
     const example = { localidad:'Suba',estrato:'3',existente:'no',pisos:'5',frente:'10',fondo:'20',cobertura:'80',aptos:'2',compararSolar:'si',
-      altura:'2.7',dosificacion:'7',capacidadViaje:'100',viajesExtra:'2',plazoMeses:'12',esperaAnios:'0',objetivoAnios:'10',kwApto:'1',
+      altura:'2.7',dosificacion:'7',capacidadViaje:'100',viajesExtra:'2',jornadasTransporte:'0',personasCuadrilla:'1',transporteDiarioPrecio:'',plazoMeses:'12',esperaAnios:'0',objetivoAnios:'10',kwApto:'1',
       excPrecio:'100000',retiroPrecio:'50000',terrenoPrecio:'250000000',cementoPrecio:'38000',viajePrecio:'450000',
       estructuraPrecio:'1400000',ingenieroPrecio:'25000000',redesPrecio:'7000000',aguaPrecio:'4000000',luzPrecio:'6000000',
       gasPrecio:'3000000',senalPrecio:'2000000',acabadosPrecio:'1100000',otrosPrecio:'180000000',
       panelPrecio:'1800000',solarRestoPrecio:'2500000',respaldoPrecio:'0',arriendo:'1600000',ocupacion:'90',
       mantenimiento:'18000000',predial:'12000000',salvamento:'800000000',ahorroSolar:'8000000',mantSolar:'1200000',salvamentoSolar:'0' };
     for (const [id,value] of Object.entries(example)) $(id).value = value;
+    suggestedPrices.clear();
     document.querySelectorAll('[data-money]').forEach(input => { $(`source-${input.id}`).value = ''; $(`date-${input.id}`).value = ''; });
     $('fuente').value = 'Ejemplo académico — cifras ficticias'; $('fechaPrecio').value = '';
-    demoLoaded = true; showConditional();
+    demoLoaded = true; showConditional(); renderRentReference();
     $('form').requestSubmit();
   });
   $('reset').addEventListener('click', () => {
+    suggestedPrices.clear();
     document.querySelectorAll('[data-money]').forEach(input => { input.value = ''; });
     document.querySelectorAll('[data-money]').forEach(input => { $(`source-${input.id}`).value = ''; $(`date-${input.id}`).value = ''; });
     $('fuente').value = ''; $('fechaPrecio').value = ''; demoLoaded = false;
@@ -309,4 +398,5 @@
   });
   buildEvidenceRegister();
   showConditional();
+  renderPriceSuggestions();
 })();

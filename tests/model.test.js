@@ -5,7 +5,7 @@ const { calculate } = require('../public/model.js');
 const base = () => ({
   pisos:5, frente:10, fondo:20, cobertura:80, aptos:2,
   altura:2.7, dosificacion:7, capacidadViaje:100, viajesExtra:2,
-  plazoMeses:12, esperaAnios:0, objetivoAnios:10, kwApto:1, existente:false, compararSolar:true,
+  plazoMeses:12, esperaAnios:0, objetivoAnios:10, jornadasTransporte:0, personasCuadrilla:1, transporteDiarioPrecio:NaN, kwApto:1, existente:false, compararSolar:true,
   excPrecio:0, retiroPrecio:0, terrenoPrecio:0, intervencionPrecio:NaN,
   cementoPrecio:0, viajePrecio:0, estructuraPrecio:0, ingenieroPrecio:0,
   redesPrecio:0, aguaPrecio:0, luzPrecio:0, gasPrecio:0, senalPrecio:0,
@@ -111,4 +111,13 @@ test('the selected target year and required rent use discounted operating years'
   assert.equal(result.finance.objectiveYear, 2);
   assert.equal(result.finance.objectiveNpv, result.finance.without.cashflow[2].discounted);
   assert.ok(Math.abs(result.finance.requiredMonthlyRent - 1000 * 1.06 ** 2 / 12) < 1e-8);
+});
+
+test('crew transportation is estimated by workdays times crew size and daily rate', () => {
+  const data=base();
+  data.jornadasTransporte=12; data.personasCuadrilla=4; data.transporteDiarioPrecio=15000;
+  const result=calculate(data);
+  const line=result.rows.find(row=>row.label==='Transporte de cuadrilla por jornada');
+  assert.equal(line.quantity,48);
+  assert.equal(line.cost,720000);
 });

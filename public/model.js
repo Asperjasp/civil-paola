@@ -19,6 +19,8 @@
     range('dosificacion', 0.1, 30);
     range('capacidadViaje', 1, 10000, true);
     range('viajesExtra', 0, 1000, true);
+    if (data.jornadasTransporte !== undefined) range('jornadasTransporte', 0, 500, true);
+    if (data.jornadasTransporte > 0) range('personasCuadrilla', 1, 100, true);
     range('plazoMeses', 1, 60, true);
     range('esperaAnios', 0, 5, true);
     range('objetivoAnios', 1, 20, true);
@@ -46,6 +48,9 @@
     if (data.existente) add('Preparación', 'Demolición, adaptación o refuerzo', 1, 'total', 'intervencionPrecio');
     add('Estructura', 'Cemento de columnas ilustrativas', bultos, 'bultos', 'cementoPrecio');
     add('Estructura', 'Viajes de material, incluido cemento', viajes, 'viajes', 'viajePrecio');
+    if (data.jornadasTransporte > 0) {
+      add('Estructura', 'Transporte de cuadrilla por jornada', data.jornadasTransporte * data.personasCuadrilla, 'jornadas-persona', 'transporteDiarioPrecio');
+    }
     add('Estructura', 'Estructura complementaria y mano de obra', areaConstruida, 'm²', 'estructuraPrecio');
     add('Estructura', 'Ingeniero estructural', 1, 'total', 'ingenieroPrecio');
     add('Instalaciones', 'Tuberías y cableado interior', apartamentos, 'apartamentos', 'redesPrecio');

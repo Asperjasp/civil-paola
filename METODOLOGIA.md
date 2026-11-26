@@ -10,6 +10,8 @@ La app separa tres cosas:
 2. **Precio o flujo monetario ingresado** por el usuario con su unidad.
 3. **Procedencia declarada** por rubro: proveedor o documento y fecha. El registro facilita auditoría, pero la app no verifica el contenido de una oferta.
 
+El botón **Aplicar costos orientativos** ofrece hipótesis de planeación para partidas seleccionadas. Usa el punto medio en general y el extremo inferior o superior en acabados económicos o premium. Los valores se cargan solo en campos visibles y vacíos, y quedan identificados como hipótesis en la auditoría. El costo de obra por piso es la suma de las partidas base ingresadas, menos el terreno, dividida entre el número de pisos. Si faltan partidas, el indicador es parcial.
+
 El [ICOCED del DANE](https://www.dane.gov.co/index.php/estadisticas-por-tema/precios-y-costos/indice-de-costos-de-la-construccion-de-edificaciones-icoced) mide variaciones de costos de edificación. No publica una cotización total para este predio ni permite inferir niveles de precio de cada insumo a partir del índice. El [visor del IDU](https://calidad.idu.gov.co/page/siipviales/economico/portafolio) ofrece precios unitarios de referencia para infraestructura vial y espacio público; la propia entidad indica que deben analizarse según las condiciones de cada proceso. Por ello se presentan como contexto para investigar, no como valores predeterminados de vivienda multifamiliar.
 
 El panel de contexto usa el boletín [ICOCED de septiembre de 2026](https://www.dane.gov.co/files/operaciones/ICOCED/bol-ICOCED-sep2026.pdf), publicado el 30 de octubre de 2026: variación mensual **nacional de −0,13 %**. El dominio estadístico Bogotá-Cundinamarca incluye Bogotá y varios municipios; no equivale a un precio de Bogotá. El indicador no alimenta ningún costo del proyecto. El workflow revisa semanalmente si existe un nuevo boletín mensual y, si lo encuentra, cambia el enlace y deja el número pendiente de revisión humana.
@@ -50,6 +52,7 @@ Cuando la localidad coincide, la recomendación compara el canon ingresado con *
 - Volumen de columnas = número de columnas × `0,30 m × 0,30 m` × altura por piso × pisos.
 - Bultos = `ceil(volumen de columnas × bultos por m³)`. La dosificación inicial es un ejemplo editable, no una especificación de concreto.
 - Viajes = `ceil(bultos / capacidad por viaje) + viajes adicionales`.
+- Transporte de cuadrilla = jornadas × personas por jornada × costo diario por persona. Añádelo si el propietario paga ese traslado aparte de la mano de obra. El atajo de $7.100 supone dos pasajes a la [tarifa plena de TransMilenio en 2026](https://www.transmilenio.gov.co/viaje-en-transmi/medios-de-pago/tarifas-del-sistema-transmilenio).
 - Área construida supuesta = área del predio × porcentaje construido × pisos. El porcentaje es una hipótesis presupuestal, no la edificabilidad autorizada.
 - Apartamentos = pisos × apartamentos por piso.
 - Potencia solar exploratoria = apartamentos × kW por apartamento.

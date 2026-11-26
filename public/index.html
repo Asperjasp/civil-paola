@@ -24,7 +24,7 @@
   </header>
 
   <main class="shell">
-    <div class="intro" role="note"><strong>Lo primero: ningún precio aparece por arte de magia.</strong> Esta versión calcula cantidades y multiplica por las cotizaciones que tú ingresas. Bogotá define el ámbito del proyecto; la localidad y el estrato no aplican recargos automáticos. El ejemplo académico contiene cifras ficticias.</div>
+    <div class="intro" role="note"><strong>Empieza con un presupuesto preliminar.</strong> Configura tu predio en Bogotá, aplica las hipótesis de costos que te sirvan y sustituye cada importe cuando consigas una cotización. El arriendo y el predial dependen del inmueble.</div>
     <section class="city-context" aria-labelledby="city-title">
       <div class="context-copy"><p class="eyebrow">Contexto local · Bogotá D. C.</p><h2 id="city-title">Tres anuncios para empezar a contrastar el arriendo</h2><p>Son ofertas publicadas, no contratos cerrados ni un promedio de mercado. El marcador ubica la <strong>localidad aproximada</strong>, no el inmueble. Compara área, habitaciones, administración y amenidades antes de usar un canon.</p><div id="city-indicator" class="city-indicator">Indicador DANE: cargando dato publicado…</div></div>
       <div class="map-panel"><div id="bogota-map" role="img" aria-label="Mapa de Bogotá con referencias aproximadas en Kennedy, Suba y Chapinero"></div><p class="map-note">Mapa: © OpenStreetMap · Puntos orientativos por localidad.</p></div>
@@ -38,7 +38,7 @@
       <div class="method-heading"><div><p class="eyebrow">Cómo leer esta estimación</p><h2 id="method-title">Datos claros, decisiones claras</h2></div><p>El resultado distingue lo medido, lo cotizado y lo supuesto. Así puedes revisar de dónde sale cada peso.</p></div>
       <div class="method-grid">
         <div><span class="method-index">01 / Cantidad</span><h3>Geometría del proyecto</h3><p>El volumen de excavación es frente × fondo × <strong>1,4 m</strong>. Los bultos de cemento y los viajes dependen de las hipótesis editables de columnas, dosificación y capacidad de transporte.</p></div>
-        <div><span class="method-index">02 / Precio</span><h3>Cotización de Bogotá</h3><p>Cada precio necesita proveedor, fecha, unidad y alcance. No se convierte un índice estadístico en una tarifa de obra ni se asume que dos localidades tienen un multiplicador fijo.</p></div>
+        <div><span class="method-index">02 / Precio</span><h3>Referencias para comenzar</h3><p>La app sugerirá rangos de planeación y sus fuentes. Sustituye esos rangos por cotizaciones de proveedor antes de decidir. La inflación estadística no equivale a tarifa de obra.</p></div>
         <div><span class="method-index">03 / Tiempo</span><h3>Flujo de inversión</h3><p>La comparación usa inversión en t = 0, arriendos y gastos anuales, valor de salvamento al año 20 y descuento del <strong>6 %</strong>. El ahorro solar solo cuenta si beneficia al propietario.</p></div>
       </div>
       <details class="method-details"><summary>Qué fuente corresponde a cada tipo de dato</summary>
@@ -64,7 +64,8 @@
           <label>Fondo del predio (m)<input id="fondo" type="number" min="0.1" step="0.1" value="20"></label>
           <label>Porcentaje construido por piso<input id="cobertura" type="number" min="1" max="100" step="1" value="80"><small>Supuesto editable; no equivale al índice urbanístico permitido.</small></label>
           <label>Apartamentos por piso<input id="aptos" type="number" min="1" step="1" value="2"></label>
-          <label>¿Comparar energía solar?<select id="compararSolar"><option value="si">Sí, comparar ambas opciones</option><option value="no">No, solo construcción base</option></select></label>
+          <div class="solar-toggle-label"><strong>¿Evaluar energía solar?</strong><button type="button" id="solar-toggle" class="solar-toggle" role="switch" aria-checked="false" aria-label="Comparar con energía solar" aria-describedby="solar-note"><span></span></button><small id="solar-note">Compara lo que cuesta instalar el sistema con el ahorro de electricidad que recibiría el propietario.</small></div>
+          <input id="compararSolar" type="hidden" value="no">
         </div>
         <details class="assumptions"><summary>Supuestos de cantidades y calendario</summary><div class="grid inside">
           <label>Altura por piso (m)<input id="altura" type="number" min="2" max="6" step="0.1" value="2.7"></label>
@@ -73,28 +74,32 @@
           <label>Viajes adicionales de materiales<input id="viajesExtra" type="number" min="0" step="1" value="0"></label>
           <label>Duración de obra (meses)<input id="plazoMeses" type="number" min="1" max="60" step="1" value="12"></label>
           <label>Años hasta iniciar la obra<input id="esperaAnios" type="number" min="0" max="5" step="1" value="0"></label>
-          <label data-solar>Potencia solar (kW/apartamento)<input id="kwApto" type="number" min="0.1" step="0.1" value="1"><small>Solo para comparar; ajustar con consumo y diseño.</small></label>
+          <label data-solar hidden>Potencia solar (kW/apartamento)<input id="kwApto" type="number" min="0.1" step="0.1" value="1"><small>1 kW por apartamento es una hipótesis editable. Dimensiona según consumo, techo disponible y sombras.</small></label>
         </div></details>
       </section>
 
       <section class="card" aria-labelledby="cost-title">
         <div class="section-heading"><span class="step">02</span><div><h2 id="cost-title">Cotiza costos en Bogotá</h2><p>Valores en COP. Vacío significa pendiente; escribe 0 si el costo realmente es cero.</p></div></div>
+        <div class="reference-panel"><button type="button" id="apply-references" class="secondary" disabled>Aplicar costos orientativos</button><p id="reference-status" aria-live="polite">Rellena campos vacíos con hipótesis editables. Para terreno, predial y otros costos del predio, usa los datos que puedas confirmar.</p></div>
         <div class="reference-line"><label>Nota general del escenario<input id="fuente" type="text" placeholder="Ej. cotizaciones para un lote en Suba"></label><label>Fecha de elaboración<input id="fechaPrecio" type="date"></label></div>
         <p class="source-intro">Cada campo conserva su unidad. En <strong>Fuentes por rubro</strong> puedes registrar de dónde salió cada precio y cuándo lo consultaste.</p>
         <div class="cost-group"><h3>Preparación <a class="formula-link" href="metodologia.html#preparacion">Entender fórmula ↗</a></h3><div class="grid">
-          <label>Excavación por m³<input id="excPrecio" data-money type="number" min="0" placeholder="COP/m³"></label>
-          <label>Transporte y disposición de excavación por m³<input id="retiroPrecio" data-money type="number" min="0" placeholder="COP/m³"></label>
-          <label>Valor del terreno o costo de oportunidad<input id="terrenoPrecio" data-money type="number" min="0" placeholder="COP total"></label>
+          <label>Excavación por m³<input id="excPrecio" data-money type="number" min="0" placeholder="COP/m³"><small class="suggestion" data-suggest="excPrecio">Referencia inicial Bogotá: consultando…</small></label>
+          <label>Transporte y disposición por m³<input id="retiroPrecio" data-money type="number" min="0" placeholder="COP/m³"><small class="suggestion" data-suggest="retiroPrecio">Referencia inicial Bogotá: consultando…</small></label>
+          <label>Valor del terreno o costo de oportunidad<input id="terrenoPrecio" data-money type="number" min="0" placeholder="COP total"><small class="suggestion">Usa el valor de compra o un avalúo comercial; el estrato no basta para inferirlo.</small></label>
           <label data-existing hidden>Demolición, adecuación o refuerzo<input id="intervencionPrecio" data-money type="number" min="0" placeholder="COP total"></label>
         </div></div>
         <div class="cost-group"><h3>Estructura <a class="formula-link" href="metodologia.html#estructura">Entender fórmula ↗</a></h3><div class="grid">
-          <label>Cemento por bulto<input id="cementoPrecio" data-money type="number" min="0" placeholder="COP/bulto"></label>
-          <label>Transporte de materiales por viaje<input id="viajePrecio" data-money type="number" min="0" placeholder="COP/viaje"></label>
-          <label>Estructura restante y mano de obra por m²<input id="estructuraPrecio" data-money type="number" min="0" placeholder="COP/m²"><small>Excluye el cemento ya contabilizado.</small></label>
+          <label>Cemento por bulto<input id="cementoPrecio" data-money type="number" min="0" placeholder="COP/bulto"><small class="suggestion" data-suggest="cementoPrecio">Referencia inicial Bogotá: consultando…</small></label>
+          <label>Transporte por viaje<input id="viajePrecio" data-money type="number" min="0" placeholder="COP/viaje"><small class="suggestion" data-suggest="viajePrecio">Referencia inicial Bogotá: consultando…</small></label>
+          <label>Jornadas de transporte de cuadrilla<input id="jornadasTransporte" type="number" min="0" max="500" step="1" value="0"><small class="suggestion">Costo diario por persona × personas × días. Añádelo si la cuadrilla se desplaza desde otra localidad.</small></label>
+          <label>Personas que se transportan por jornada<input id="personasCuadrilla" type="number" min="1" max="100" step="1" value="1"></label>
+          <div><label>Transporte diario por persona<input id="transporteDiarioPrecio" data-money type="number" min="0" placeholder="COP/persona/día"></label><small class="suggestion">Ejemplo de ida y vuelta con dos pasajes pagos de $3.550. Ajusta por ruta, transbordos y medio de transporte. <a href="https://www.transmilenio.gov.co/viaje-en-transmi/medios-de-pago/tarifas-del-sistema-transmilenio">Tarifa oficial TransMilenio 2026</a></small><button type="button" class="secondary field-action" id="apply-transit">Usar $7.100 por día</button></div>
+          <label>Estructura restante y mano de obra por m²<input id="estructuraPrecio" data-money type="number" min="0" placeholder="COP/m²"><small>Excluye el cemento ya contabilizado.</small><small class="suggestion" data-suggest="estructuraPrecio">Referencia inicial Bogotá: consultando…</small></label>
           <label>Honorarios del ingeniero estructural<input id="ingenieroPrecio" data-money type="number" min="0" placeholder="COP total"></label>
         </div></div>
         <div class="cost-group"><h3>Instalaciones y servicios <a class="formula-link" href="metodologia.html#instalaciones">Entender fórmula ↗</a></h3><div class="grid">
-          <label>Tuberías y cableado por apartamento<input id="redesPrecio" data-money type="number" min="0" placeholder="COP/apartamento"></label>
+          <label>Tuberías y cableado por apartamento<input id="redesPrecio" data-money type="number" min="0" placeholder="COP/apartamento"><small class="suggestion" data-suggest="redesPrecio">Referencia inicial Bogotá: consultando…</small></label>
           <label>Conexión de agua<input id="aguaPrecio" data-money type="number" min="0" placeholder="COP total"></label>
           <label>Conexión eléctrica<input id="luzPrecio" data-money type="number" min="0" placeholder="COP total"></label>
           <label>Conexión de gas<input id="gasPrecio" data-money type="number" min="0" placeholder="COP total"></label>
@@ -102,12 +107,12 @@
         </div></div>
         <div class="cost-group"><h3>Acabados y cierre <a class="formula-link" href="metodologia.html#acabados">Entender fórmula ↗</a></h3><div class="grid">
           <label>Nivel de acabados<select id="nivel"><option>Económico</option><option selected>Estándar</option><option>Premium</option></select></label>
-          <label>Costo del nivel elegido por m²<input id="acabadosPrecio" data-money type="number" min="0" placeholder="COP/m²"><small>Actualiza esta cotización al cambiar de nivel.</small></label>
+          <label>Costo del nivel elegido por m²<input id="acabadosPrecio" data-money type="number" min="0" placeholder="COP/m²"><small>Actualiza esta cotización al cambiar de nivel.</small><small class="suggestion" data-suggest="acabadosPrecio">Referencia inicial Bogotá: consultando…</small></label>
           <label>Otros costos de obra, licencias y reserva<input id="otrosPrecio" data-money type="number" min="0" placeholder="COP total"><small>Incluye capítulos aún no desglosados, como cubierta o ascensor si procede.</small></label>
         </div></div>
-        <div class="cost-group" data-solar><h3>Alternativa solar <a class="formula-link" href="metodologia.html#solar">Entender fórmula ↗</a></h3><p class="group-note">Cotiza la potencia completa: paneles y el resto del sistema. El generador o baterías son opcionales.</p><div class="grid">
-          <label>Adquisición de paneles por kW<input id="panelPrecio" data-money type="number" min="0" placeholder="COP/kW"></label>
-          <label>Inversor, estructura, protecciones, cables e instalación por kW<input id="solarRestoPrecio" data-money type="number" min="0" placeholder="COP/kW"></label>
+        <div class="cost-group solar-option" data-solar hidden><h3>Alternativa solar <a class="formula-link" href="metodologia.html#solar">Entender fórmula ↗</a></h3><p class="group-note">Suma paneles, equipos e instalación. Para estimar ahorro, usa la parte del recibo que el propietario paga y que podría cubrirse con generación propia. Cotiza el respaldo por separado si necesitas energía durante cortes.</p><div class="grid">
+          <label>Adquisición de paneles por kW<input id="panelPrecio" data-money type="number" min="0" placeholder="COP/kW"><small class="suggestion" data-suggest="panelPrecio">Referencia inicial Bogotá: consultando…</small></label>
+          <label>Inversor, estructura, protecciones, cables e instalación por kW<input id="solarRestoPrecio" data-money type="number" min="0" placeholder="COP/kW"><small class="suggestion" data-suggest="solarRestoPrecio">Referencia inicial Bogotá: consultando…</small></label>
           <label>Generador o baterías<input id="respaldoPrecio" data-money type="number" min="0" placeholder="COP total opcional"></label>
         </div></div>
         <details class="source-register"><summary id="sources-summary">Fuentes por rubro</summary><p class="group-note">Anota un proveedor, factura, enlace o cotización y su fecha. Registrar una fuente permite auditar el dato; no significa que CONSTRUPLAN haya verificado la oferta.</p><div id="evidence-list" class="table-wrap"></div></details>
@@ -116,14 +121,14 @@
       <section class="card" aria-labelledby="flow-title">
         <div class="section-heading"><span class="step">03</span><div><h2 id="flow-title">Proyecta ingresos y gastos</h2><p>Flujos anuales constantes en COP de hoy. La tasa de descuento es 6 % anual.</p></div></div>
         <div class="grid">
-          <label>Arriendo mensual por apartamento<input id="arriendo" data-money type="number" min="0" placeholder="COP/mes"></label>
+          <div><label>Arriendo mensual por apartamento<input id="arriendo" data-money type="number" min="0" placeholder="COP/mes"></label><small id="rent-reference" class="suggestion" aria-live="polite">Selecciona una localidad para ver si hay un anuncio de referencia.</small><button type="button" class="secondary field-action" id="apply-rent" hidden>Simular con el canon anunciado</button></div>
           <label>Ocupación esperada<input id="ocupacion" type="number" min="0" max="100" value="90" placeholder="%"><small>90 % equivale a 10 % de vacancia.</small></label>
-          <label>Mantenimiento del edificio por año<input id="mantenimiento" data-money type="number" min="0" placeholder="COP/año"></label>
+          <label>Mantenimiento del edificio por año<input id="mantenimiento" data-money type="number" min="0" placeholder="COP/año"><small>Suma reparaciones previstas, aseo, mantenimiento de equipos y servicios comunes a cargo del dueño.</small></label>
           <label>Impuesto predial por año<input id="predial" data-money type="number" min="0" placeholder="COP/año"><small>Usa una estimación del predio; no se deduce del estrato.</small></label>
           <label>Valor de salvamento del predio y edificio al año 20<input id="salvamento" data-money type="number" min="0" placeholder="COP al año 20"><small>Valor residual que tú estimas.</small></label>
           <label>Plazo objetivo para recuperar la inversión<input id="objetivoAnios" type="number" min="1" max="20" step="1" value="10"><small>Tu meta personal, no un promedio de Bogotá. Entre 1 y 20 años.</small></label>
         </div>
-        <div class="cost-group" data-solar><h3>Beneficio anual de la opción solar</h3><div class="grid">
+        <div class="cost-group solar-option" data-solar hidden><h3>Beneficio anual de la opción solar</h3><div class="grid">
           <label>Ahorro anual que recibe el propietario<input id="ahorroSolar" data-money type="number" min="0" placeholder="COP/año"><small>Si el inquilino paga la energía y no se traslada el beneficio al propietario, escribe 0.</small></label>
           <label>Mantenimiento solar por año<input id="mantSolar" data-money type="number" min="0" placeholder="COP/año"></label>
           <label>Valor residual solar al año 20<input id="salvamentoSolar" data-money type="number" min="0" placeholder="COP al año 20"></label>
